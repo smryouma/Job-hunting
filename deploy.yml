@@ -22,8 +22,12 @@ jobs:
         run: |
           pip install -r requirements.txt
 
-      - name: Deploy to Firebase
+      - name: Create Firebase Key File
+        run: |
+          echo "$FIREBASE_PRIVATE_KEY" | base64 --decode > firebase_key.json
         env:
           FIREBASE_PRIVATE_KEY: ${{ secrets.FIREBASE_PRIVATE_KEY }}
+
+      - name: Deploy to Firebase
         run: |
           python app.py  # Streamlit アプリを起動
