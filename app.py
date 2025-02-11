@@ -9,13 +9,18 @@ st.title("就活タスク管理アプリ「タスカン！！」")
 # 🔹 Firebaseの認証方法を変更（GitHub Actions対応）
 if not firebase_admin._apps:
     firebase_key_env = os.getenv("FIREBASE_PRIVATE_KEY")  # 環境変数から読み込み
+    firebase_key_path = "firebase_key.json"  # ローカル用
 
-    if firebase_key_env:  # GitHub Actions で環境変数を使用
-        firebase_credentials = json.loads(firebase_key_env.replace("\\n", "\n"))  # 改行を処理
+    if firebase_key_env:  # GitHub Actions 環境
+        firebase_credentials = json.loads(firebase_key_env.replace("\\n", "\n"))  # 改行を適切に処理
         cred = credentials.Certificate(firebase_credentials)
-    else:  # ローカル開発環境の場合
-        firebase_key_path = "/Users/ooishikonryouma/株価分析/path/firebase_key.json"
+        st.write("✅ Firebase 認証（GitHub Actions 経由）")
+    elif os.path.exists(firebase_key_path):  # ローカル環境にファイルがある場合
         cred = credentials.Certificate(firebase_key_path)
+        st.write("✅ Firebase 認証（ローカル firebase_key.json 経由）")
+    else:
+        st.error("⚠️ Firebase 認証に失敗しました！環境変数または `firebase_key.json` が見つかりません。")
+        st.stop()
 
     firebase_admin.initialize_app(cred)
 
