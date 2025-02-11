@@ -3,39 +3,27 @@ name: Deploy to Firebase
 on:
   push:
     branches:
-      - main  # mainブランチへのプッシュ時に実行
+      - main
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-      # ✅ リポジトリのコードをチェックアウト
       - name: Checkout code
         uses: actions/checkout@v2
 
-      # ✅ Python環境のセットアップ
       - name: Set up Python
         uses: actions/setup-python@v2
         with:
           python-version: '3.x'
 
-      # ✅ Firebase秘密鍵のJSONファイルを作成
-      - name: Create Firebase Key File
-        run: |
-          echo "$FIREBASE_PRIVATE_KEY" | base64 --decode > firebase_key.json
-        env:
-          FIREBASE_PRIVATE_KEY: ${{ secrets.FIREBASE_PRIVATE_KEY }}
-
-      # ✅ 必要な依存関係をインストール
       - name: Install dependencies
         run: |
           pip install -r requirements.txt
 
-      # ✅ Firebaseへデプロイ
       - name: Deploy to Firebase
         env:
-          FIREBASE_API_KEY: ${{ secrets.FIREBASE_API_KEY }}
-          FIREBASE_PROJECT_ID: ${{ secrets.FIREBASE_PROJECT_ID }}
+          FIREBASE_PRIVATE_KEY: ${{ secrets.FIREBASE_PRIVATE_KEY }}
         run: |
-          python deploy.py  # deploy.pyでFirebaseへのデプロイを実行
+          python app.py  # Streamlit アプリを起動
