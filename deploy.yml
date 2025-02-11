@@ -3,7 +3,7 @@ name: Deploy to Firebase
 on:
   push:
     branches:
-      - main
+      - main  # mainブランチに push されたときに実行
 
 jobs:
   build:
@@ -22,7 +22,7 @@ jobs:
         run: |
           pip install -r requirements.txt
 
-      - name: Create Firebase Key File
+      - name: Create Firebase Key File  # GitHub Secrets から JSON を復元
         run: |
           echo "$FIREBASE_PRIVATE_KEY" | base64 --decode > firebase_key.json
         env:
