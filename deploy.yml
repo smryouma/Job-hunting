@@ -10,26 +10,32 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # リポジトリのコードをチェックアウト
+      # ✅ リポジトリのコードをチェックアウト
       - name: Checkout code
         uses: actions/checkout@v2
 
-      # Python環境のセットアップ
+      # ✅ Python環境のセットアップ
       - name: Set up Python
         uses: actions/setup-python@v2
         with:
           python-version: '3.x'
 
-      # 必要な依存関係をインストール
+      # ✅ Firebase秘密鍵のJSONファイルを作成
+      - name: Create Firebase Key File
+        run: |
+          echo "$FIREBASE_PRIVATE_KEY" | base64 --decode > firebase_key.json
+        env:
+          FIREBASE_PRIVATE_KEY: ${{ secrets.FIREBASE_PRIVATE_KEY }}
+
+      # ✅ 必要な依存関係をインストール
       - name: Install dependencies
         run: |
           pip install -r requirements.txt
 
-      # Firebaseへデプロイ
+      # ✅ Firebaseへデプロイ
       - name: Deploy to Firebase
         env:
-          FIREBASE_API_KEY: ${{ secrets.FIREBASE_API_KEY }}  # GitHub Secretの環境変数を指定
+          FIREBASE_API_KEY: ${{ secrets.FIREBASE_API_KEY }}
           FIREBASE_PROJECT_ID: ${{ secrets.FIREBASE_PROJECT_ID }}
-          FIREBASE_PRIVATE_KEY: ${{ secrets.FIREBASE_PRIVATE_KEY }}
         run: |
-          python deploy.py  # deploy.pyというファイルでFirebaseへのデプロイを実行
+          python deploy.py  # deploy.pyでFirebaseへのデプロイを実行
