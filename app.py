@@ -1,13 +1,22 @@
 import streamlit as st
 import firebase_admin
-from firebase_admin import credentials, firestore
 import pandas as pd
+from firebase_admin import credentials, firestore
+import os
+import json
 
 st.title("就活タスク管理アプリ")
 
-# Firestore の初期化
+# 🔹 Firebaseの認証方法を変更（GitHub Actions対応）
 if not firebase_admin._apps:
-    cred = credentials.Certificate("firebase_key.json")
+    firebase_key_path = "/Users/ooishikonryouma/株価分析/path/firebase_key.json"
+
+    if os.getenv("FIREBASE_PRIVATE_KEY"):  # GitHub Actions の場合
+        firebase_credentials = json.loads(os.getenv("FIREBASE_PRIVATE_KEY"))
+        cred = credentials.Certificate(firebase_credentials)
+    else:  # ローカル開発環境の場合
+        cred = credentials.Certificate(firebase_key_path)
+
     firebase_admin.initialize_app(cred)
 
 db = firestore.client()
@@ -58,10 +67,10 @@ if companies:
             "選考状況": company_data.get("status", "ES未提出"),
             "ES": company_data.get("es", "❌"),
             "企業分析": company_data.get("analysis", "❌"),
-            "ES URL": f"({company_data.get('es_url', '')})" if company_data.get("es_url") else "",
-            "採用ページURL": f"({company_data.get('recruit_url', '')})" if company_data.get("recruit_url") else "",
-            "企業HP": f"({company_data.get('company_hp', '')})" if company_data.get("company_hp") else "",
-            "メモURL": f"({company_data.get('memo_url', '')})" if company_data.get("memo_url") else "",
+            "ES URL": f"[リンク]({company_data.get('es_url', '')})" if company_data.get("es_url") else "",
+            "採用ページURL": f"[リンク]({company_data.get('recruit_url', '')})" if company_data.get("recruit_url") else "",
+            "企業HP": f"[リンク]({company_data.get('company_hp', '')})" if company_data.get("company_hp") else "",
+            "メモURL": f"[リンク]({company_data.get('memo_url', '')})" if company_data.get("memo_url") else "",
             "ID": company_id  
         })
 
