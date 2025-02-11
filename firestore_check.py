@@ -1,7 +1,7 @@
 import firebase_admin
 from firebase_admin import credentials, firestore
 
-# Firestore の初期化をチェック
+# Firestore の初期化をチェックする
 if not firebase_admin._apps:
     cred = credentials.Certificate("job-hunting-cea79-firebase-adminsdk-fbsvc-57d47daaeb.json")  # 🔹 キーファイル名を正しく指定
     firebase_admin.initialize_app(cred)
