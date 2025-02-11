@@ -1,20 +1,20 @@
 import streamlit as st
 import firebase_admin
-import pandas as pd
 from firebase_admin import credentials, firestore
 import os
 import json
 
-st.title("就活タスク管理アプリ")
+st.title("就活タスク管理アプリ「タスカン！！」")
 
 # 🔹 Firebaseの認証方法を変更（GitHub Actions対応）
 if not firebase_admin._apps:
-    firebase_key_path = "/Users/ooishikonryouma/株価分析/path/firebase_key.json"
+    firebase_key_env = os.getenv("FIREBASE_PRIVATE_KEY")  # 環境変数から読み込み
 
-    if os.getenv("FIREBASE_PRIVATE_KEY"):  # GitHub Actions の場合
-        firebase_credentials = json.loads(os.getenv("FIREBASE_PRIVATE_KEY"))
+    if firebase_key_env:  # GitHub Actions で環境変数を使用
+        firebase_credentials = json.loads(firebase_key_env.replace("\\n", "\n"))  # 改行を処理
         cred = credentials.Certificate(firebase_credentials)
     else:  # ローカル開発環境の場合
+        firebase_key_path = "/Users/ooishikonryouma/株価分析/path/firebase_key.json"
         cred = credentials.Certificate(firebase_key_path)
 
     firebase_admin.initialize_app(cred)
@@ -60,6 +60,7 @@ companies = {doc.id: doc.to_dict() for doc in docs}
 
 # 🔹 表データを作成
 if companies:
+    import pandas as pd
     data = []
     for company_id, company_data in companies.items():
         data.append({
@@ -67,10 +68,10 @@ if companies:
             "選考状況": company_data.get("status", "ES未提出"),
             "ES": company_data.get("es", "❌"),
             "企業分析": company_data.get("analysis", "❌"),
-            "ES URL": f"[リンク]({company_data.get('es_url', '')})" if company_data.get("es_url") else "",
-            "採用ページURL": f"[リンク]({company_data.get('recruit_url', '')})" if company_data.get("recruit_url") else "",
-            "企業HP": f"[リンク]({company_data.get('company_hp', '')})" if company_data.get("company_hp") else "",
-            "メモURL": f"[リンク]({company_data.get('memo_url', '')})" if company_data.get("memo_url") else "",
+            "ES URL": f"({company_data.get('es_url', '')})" if company_data.get("es_url") else "",
+            "採用ページURL": f"({company_data.get('recruit_url', '')})" if company_data.get("recruit_url") else "",
+            "企業HP": f"({company_data.get('company_hp', '')})" if company_data.get("company_hp") else "",
+            "メモURL": f"({company_data.get('memo_url', '')})" if company_data.get("memo_url") else "",
             "ID": company_id  
         })
 
